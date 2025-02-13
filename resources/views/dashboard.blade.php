@@ -3,7 +3,6 @@
 
 @section('some_styles')
     <link rel="stylesheet" href="{{ asset('css/dashboard/dashboard.css') }}" />
-
 @endsection
 
 @section('content')
@@ -25,11 +24,11 @@
 
     <div class="conference-applications">
         <h3>Мои регистрации</h3>
-        @if (count(Auth::user()->applications) === 0)
+        @if ($user->applications->isEmpty())
             <p>Вы не зарегистрированы ни на одну секцию</p>
         @else
             <div class="applications">
-                @foreach(Auth::user()->applications as $application)
+                @foreach($user->applications as $application)
                     <div class="application">
                         <div class="up">
                             <p>Соавторы: {{ $application->otherAuthors }}</p>
@@ -40,27 +39,27 @@
                         </div>
                         <div class="down">
                             <p>Название доклада: {{ $application->name }}</p>
-
-                            <a class="link @if(!$currentDate->between($application->section->konf->conferenceDates->date_start,
-                                    $application->section->konf->conferenceDates->deadline) and $application->status != 1) inactive @endif" onclick="openModal()">Прикрепить публикацию</a>
-
-                        @if ($application->file_path)
-                            <p>
-                                Статус:
-                                @if ($application->status == 1)
-                                    <span class="status status-approved">Одобрено</span>
-                                @elseif ($application->status == 2)
-                                    <span class="status status-rejected">Отклонено</span>
-                                @else
-                                    <span class="status status-pending">В ожидании</span>
-                                @endif
-                            </p>
-                        @else
-                            <p>
-                                Статус:
-                                <span class="status status-pending">Не прикреплено</span>
-                            </p>
-                        @endif
+                            <a
+                                class="link {{ !$currentDate->between($application->section->konf->conferenceDates->date_start, $application->section->konf->conferenceDates->deadline) && $application->status != 1 ? 'inactive' : '' }}"
+                                data-application-id="{{ $application->id }}"
+                                onclick="openModal(this)"
+                            >
+                                Прикрепить публикацию
+                            </a>
+                            @if ($application->file_path)
+                                <p>
+                                    Статус:
+                                    @if ($application->status == 1)
+                                        <span class="status status-approved">Одобрено</span>
+                                    @elseif ($application->status == 2)
+                                        <span class="status status-rejected">Отклонено</span>
+                                    @else
+                                        <span class="status status-pending">В ожидании</span>
+                                    @endif
+                                </p>
+                            @else
+                                <p>Статус: <span class="status status-pending">Не прикреплено</span></p>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -73,7 +72,7 @@
             <span class="close" onclick="closeModal()">&times;</span>
             <form method="POST" action="{{ route('conf.dock') }}" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="application_id" value="{{ isset($application) ? $application->id : '' }}">
+                <input type="hidden" name="application_id" id="application_id">
                 <h1>Публикация доклада</h1>
                 <div class="form-group">
                     <label for="file">Файл:</label>
@@ -87,8 +86,10 @@
 
 @section('scripts')
     <script>
-        function openModal() {
+        function openModal(element) {
             var modal = document.getElementById('imageModal');
+            var applicationId = element.getAttribute('data-application-id');
+            document.getElementById('application_id').value = applicationId;
             modal.style.display = 'block';
         }
 

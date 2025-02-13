@@ -30,17 +30,20 @@ class EmailController extends Controller
     {
         ini_set('max_execution_time', 3600);
 
-        $emailList = request('emails');
-        $emails = explode("\n", $emailList);
+        $emailsForSend = EmailsForSend::all();
 
-        foreach ($emails as $email) {
-            Mail::send(['text' => 'emails/mail'], ['name' => ''], function($message) use ($email) {
-                $message->to($email)
-                    ->subject('Приглашение на Всероссийскую конференцию молодых ученых "МАТЕМАТИЧЕСКОЕ И ИНФОРМАЦИОННОЕ МОДЕЛИРОВАНИЕ" (МИМ-2024)')
-                    ->from('stud0000264064@utmn.ru', 'Организатор конференции МИМ-2024');
-            });
+        foreach ($emailsForSend as $emailItem) {
+            $email = $emailItem->email;
+            $pdfPath = public_path('pdf/Сб-Матем-моделир-А4-2024 [WUuv1Y].pdf');
 
-            set_time_limit(0);
+                Mail::send('emails.mail', ['name' => ''], function($message) use ($email, $pdfPath) {
+                    $message->to($email)
+                        ->subject('Сборник конференции "Математическое и информационное моделирование 2024"')
+                        ->from('stud0000264064@utmn.ru', 'Организатор конференции МИМ-2024')
+                        ->attach($pdfPath);
+                });
+
+                set_time_limit(0);
         }
 
         return redirect()->back()->with('success', 'Приглашения успешно разосланы');

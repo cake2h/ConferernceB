@@ -7,6 +7,7 @@ use App\Http\Controllers\ConfController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\PythonController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\Process\Process;
 
@@ -35,6 +36,7 @@ Route::prefix('moder')->middleware('moder')->group(function () {
 
 Route::prefix('admin')->middleware(['admin', 'auth'])->group(function () {
     Route::get('/main', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/statistics', [StatisticsController::class, 'showStatistics']);
 
     Route::get('/emails', [EmailController::class, 'emailsPage'])->name('page.emails');
     Route::post('/save-mail', [EmailController::class, 'saveMail'])->name('save.mail');

@@ -49,7 +49,7 @@ class SectionController extends Controller
             'event_place' => $request->event_place,
         ]);
 
-        return redirect()->route('admin.sections.index', $conference);
+        return redirect()->route('admin.index', $conference);
     }
 
     public function edit(Conf $conference, Section $section)
@@ -94,14 +94,13 @@ class SectionController extends Controller
             'event_place' => $request->event_place,
         ]);
 
-        return redirect()->route('admin.sections.index', $conference)->with('success', 'Секция успешно обновлена.');
+        return redirect()->route('admin.index', $conference)->with('success', 'Секция успешно обновлена.');
     }
 
     public function destroy(Conf $conference, Section $section)
     {
         $section->delete();
 
-        return redirect()->route('admin.sections.index', $conference);
     }
 
     public function addModerator(Request $request, $conferenceId)
